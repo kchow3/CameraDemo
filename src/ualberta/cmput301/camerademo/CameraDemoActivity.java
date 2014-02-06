@@ -1,8 +1,11 @@
 package ualberta.cmput301.camerademo;
 
+import java.util.Date;
+
 import ualberta.cmput301.camerodemo.R;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +21,7 @@ public class CameraDemoActivity extends Activity {
 	private TextView textView;
 	private ImageButton imageButton;
 	private Uri imageFileUri;
+	private String filePath;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,19 +48,29 @@ public class CameraDemoActivity extends Activity {
 	// need implement onAcitityResult() method.
 	public void takeAPhoto() {
 		// To Do	
+		Date date = new Date();
+		filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp/" + date.toString() + ".jpg";
+		imageFileUri = Uri.parse(filePath);
+		
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		intent.putExtra("MediaStoreExtra_Output", imageFileUri);
 		startActivityForResult(intent, 0);
 		
 	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// To Do
+		int width = 0;
+		int height = 0;
 		if(requestCode == 0)
 		{
 			if(resultCode == RESULT_OK)
 			{
+				width = imageButton.getWidth();
+				height = imageButton.getHeight();
 				Bitmap bm = (Bitmap) data.getExtras().getParcelable("data");
-				imageButton.setImageBitmap(bm);
+				Bitmap newBM = Bitmap.createScaledBitmap(bm, width, height, false);
+				imageButton.setImageBitmap(newBM);
 				textView.setText("photo OK");
 			}
 			else
